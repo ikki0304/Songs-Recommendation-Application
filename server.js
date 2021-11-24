@@ -35,9 +35,9 @@ app.post("/recommendations", async (req, res) => {
     return res.status(400).send({ message: "Bad Request - must send a JSON body with track and artist" })
   }
   
-  const { track, artist } = req.body
+  const { artist1, artist2, artist3 } = req.body
   
-  if(!track || !artist) {
+  if(!artist1||!artist2||!artist3) {
     return res.status(400).send({ message: "Bad Request - must pass a track and artist" })
   }
   
@@ -54,18 +54,18 @@ app.post("/recommendations", async (req, res) => {
   const http = axios.create({ headers: { 'Authorization': `Bearer ${accessToken}` }})
   
   // 2. get track id from search
-  let trackId;
+  var[] artistID=[1,2,3]
   
   try {
-    const result = await searchTracks(http, { track, artist })
-    const { tracks } = result
+    const result = await searchTracks(http, { artist1, artist2, artist3 })
+    const { artists } = result
     
     if(!tracks || !tracks.items || !tracks.items.length ) {
-      return res.status(404).send({ message: `Song '${track}' by ${artist} not found.` })
+      return res.status(404).send({ message: `Artists ${artist1}, ${artist2} or ${artist3} not found.` })
     }
     
     // save the first search result's trackId to a variable
-    trackId = tracks.items[0].id
+    artistId1 = artists.items[0].id
   } catch(err) {
     console.error(err.message)
     return res.status(500).send({ message: "Error when searching tracks" })

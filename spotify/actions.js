@@ -1,10 +1,10 @@
 const BASE_URL = "https://api.spotify.com/v1"
 
 // uses Spotify's Search API to search tracks by track name and artist
-const searchTracks = async (http, { track, artist }) => {
+const searchTracks = async (http, {artist}) => {
   const config = {
     method: 'get',
-    url: `${BASE_URL}/search?q=track:${track}+artist:${artist}&type=track`
+    url: `${BASE_URL}/search?type=artist&q=${artist}`
   };
   
   return http(config)
@@ -12,10 +12,10 @@ const searchTracks = async (http, { track, artist }) => {
 }
 
 /// uses Spotify's Browse API to get song recommendations
-const getRecommendations = async (http, { trackId }) => {  
+const getRecommendations = async (http, { artistId1, artistId2, artistId3 }) => {  
   const config = {
     method: 'get',
-    url: `${BASE_URL}/recommendations?seed_tracks=${trackId}`,
+    url: `${BASE_URL}/recommendations?seed_artists=${artistId1},${artistId2},${artistId3}`,
   };
 
   return http(config)

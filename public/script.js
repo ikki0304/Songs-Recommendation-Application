@@ -20,13 +20,15 @@ const submitForm = async (event) => {
     
     // get form values 
     const { elements } = event.target
-    const track = elements.track.value
-    const artist = elements.artist.value
+    const artist1=elements.artist1.value
+    const artist2=elements.artist2.value
+    const artist3=elements.artist3.value
+  
 
     // send a POST request to the backend /recommendations path to get song recommendations
     let result
     try {
-      result = await axios.post("/recommendations", { track, artist })
+      result = await axios.post("/recommendations", { artist1,artist2,artist3 })
     }catch (err) {
       let errMsg = "Something went wrong"
       // overwrite generic error message with server error if present
