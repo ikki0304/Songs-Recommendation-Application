@@ -34,16 +34,14 @@ app.get("/", (req, res) => {
 
 app.post("/recommendations", async (req, res) => {
   if (!req.body) {
-    return res
-      .status(400)
-      .send({
-        message: "Bad Request - must send a JSON body with track and artist"
-      });
+    return res.status(400).send({
+      message: "Bad Request - must send a JSON body with track and artist"
+    });
   }
 
   const { artist1, artist2, artist3 } = req.body;
   const artist = new Array(artist1, artist2, artist3);
-  
+
   if (!artist1 || !artist2 || !artist3) {
     return res
       .status(400)
@@ -52,6 +50,7 @@ app.post("/recommendations", async (req, res) => {
 
   // 1. Get access token
   let accessToken;
+  
   try {
     accessToken = await getAccessToken();
   } catch (err) {
@@ -69,30 +68,36 @@ app.post("/recommendations", async (req, res) => {
   // 2. get track id from search
   const artistIDs = new Array();
 
-  for (var i = 0; i < 3; ++i) {
+  artist.forEach(async artist => {
     try {
-      const result = await searchTracks(http, {artist[i]});
+      const result = await searchTracks(http, { artist });
       const { artists } = result.arists;
 
-      if (!tracks || !tracks.items || !tracks.items.length) {
-        return res
-          .status(404)
-          .send({
-            message: `Artists ${artist[i]} not found.`
-          });
+      if (!artists || !artists.items || !artists.items.length) {
+        return res.status(404).send({
+          message: `Artists ${artist} not found.`
+        });
       }
 
       // save the first search result's trackId to a variable
-      artistID.push(artists.items[0].id);
+      artistIDs.push(artists.items[0].id);
     } catch (err) {
       console.error(err.message);
       return res.status(500).send({ message: "Error when searching tracks" });
     }
-  }
+  });
 
   // 3. get song recommendations
+  
+  const artistID1=artistsIDs[0];
+  const artistID2=artistIDs[1];
+  const artistID3=artistIDs[2];
   try {
-    const result = await getRecommendations(http, { artistID[0],artistID[1],artistID[2] });
+    const result = await getRecommendations(http, {
+      artistID1,
+      artistID2,
+      artistID3
+    });
     const { tracks } = result;
 
     // if no songs returned in search, send a 404 response
