@@ -68,7 +68,7 @@ app.post("/recommendations", async (req, res) => {
   // 2. get track id from search
   const artistIDs = new Array();
 
-  artist.forEach(async artist => {
+  await artist.forEach(async artist => {
     try {
       const result = await searchTracks(http, { artist });
       const { artists } = result;
@@ -80,18 +80,21 @@ app.post("/recommendations", async (req, res) => {
       }
 
       // save the first search result's trackId to a variable
+      console.log(artists.items[0].id);
       artistIDs.push(artists.items[0].id);
+      console.log(artistIDs);
     } catch (err) {
       console.error(err.message);
       return res.status(500).send({ message: "Error when searching tracks" });
     }
   });
-
   // 3. get song recommendations
   
-  const artistID1=artistIDs[0];
+  const artistID1=artistIDs.get(0);
   const artistID2=artistIDs[1];
   const artistID3=artistIDs[2];
+  
+  console.log(artistIDs[0] + " "+ artistIDs[1]);
   
   try {
     const result = await getRecommendations(http, {
