@@ -40,7 +40,7 @@ app.post("/recommendations", async (req, res) => {
   }
 
   const { artist1, artist2, artist3 } = req.body;
-  const artist = new Array(artist1, artist2, artist3);
+  
 
   if (!artist1 || !artist2 || !artist3) {
     return res
@@ -66,62 +66,82 @@ app.post("/recommendations", async (req, res) => {
   });
 
   // 2. get track id from search
-  const artistIDs = new Array();
-  let artistID1;
-  let artistID2;
-  let artistID3;
-
-    artist.forEach(async artist => {
-      try {
-        const result = await searchTracks(http, { artist });
-        const { artists } = result;
-
-        if (!artists || !artists.items || !artists.items.length) {
-          return res.status(404).send({
-            message: `Artists ${artist} not found.`
-          });
-        }
-
-        // save the first search result's trackId to a variable
-        console.log(artists.items[0].id);
-        artistIDs.push(artists.items[0].id);
-        //console.log(artistIDs);
-      } catch (err) {
-        console.error(err.message);
-        return res.status(500).send({ message: "Error when searching tracks" });
-      }
-    });
-    // 3. get song recommendations
-
-    const artistID1 = artistIDs[0];
-    const artistID2 = artistIDs[1];
-    const artistID3 = artistIDs[2];
-    console.log("populated");
-
+  const getArtistIDs = async ({ artist }) => {
     try {
-      console.log(artistID1, artistID2, artistID3);
-      const result = await getRecommendations(http, {
-        artistID1,
-        artistID2,
-        artistID3
-      });
-      const { tracks } = result;
+      const result = await searchTracks(http, { artist });
+      const { artists } = result;
 
-      // if no songs returned in search, send a 404 response
-      if (!tracks || !tracks.length) {
-        return res.status(404).send({ message: "No recommendations found." });
+      if (!artists || !artists.items || !artists.items.length) {
+        return res.status(404).send({
+          message: `Artists ${artist} not found.`
+        });
       }
 
-      // Success! Send track recommendations back to client
-      return res.send({ tracks });
+      // save the first search result's trackId to a variable
+      console.log(artists.items[0].id);
+      return artists.items[0].id;
+      //console.log(artistIDs);
     } catch (err) {
       console.error(err.message);
-      return res
-        .status(500)
-        .send({
-          message: "Something went wrong when fetching recommendations"
-        });
+      return res.status(500).send({ message: "Error when searching tracks" });
     }
+  };
+  
+  const artistID1=await getArtistIDs(artist1)
+  const artistID2=await getArtistIDs(artist2)
+  const artistID3=await getArtistIDs(artist3)
+  
+  console.log()
+
+  //     artist.forEach(async artist => {
+  //       try {
+  //         const result = await searchTracks(http, { artist });
+  //         const { artists } = result;
+
+  //         if (!artists || !artists.items || !artists.items.length) {
+  //           return res.status(404).send({
+  //             message: `Artists ${artist} not found.`
+  //           });
+  //         }
+
+  //         // save the first search result's trackId to a variable
+  //         console.log(artists.items[0].id);
+  //         artistIDs.push(artists.items[0].id);
+  //         //console.log(artistIDs);
+  //       } catch (err) {
+  //         console.error(err.message);
+  //         return res.status(500).send({ message: "Error when searching tracks" });
+  //       }
+  //     });
+  // 3. get song recommendations
+
+  const artistID1 = artistIDs[0];
+  const artistID2 = artistIDs[1];
+  const artistID3 = artistIDs[2];
+  console.log("populated");
+
+  try {
+    console.log(artistID1, artistID2, artistID3);
+    const result = await getRecommendations(http, {
+      artistID1,
+      artistID2,
+      artistID3
+    });
+    const { tracks } = result;
+
+    // if no songs returned in search, send a 404 response
+    if (!tracks || !tracks.length) {
+      return res.status(404).send({ message: "No recommendations found." });
+    }
+
+    // Success! Send track recommendations back to client
+    return res.send({ tracks });
+  } catch (err) {
+    console.error(err.message);
+    return res.status(500).send({
+      message: "Something went wrong when fetching recommendations"
+    });
+  }
 });
 
 // after our app has been set up above, start listening on a port provided by Glitch
