@@ -66,9 +66,9 @@ app.post("/recommendations", async (req, res) => {
   });
 
   // 2. get track id from search
-  const getArtistIDs = async ({ artist }) => {
+  const getArtistIDs = async (artist) => {
     try {
-      const result = await searchTracks(http, { artist });
+      const result = await searchTracks(http, artist);
       const { artists } = result;
 
       if (!artists || !artists.items || !artists.items.length) {

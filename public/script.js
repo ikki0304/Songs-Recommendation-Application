@@ -41,10 +41,10 @@ const submitForm = async (event) => {
     const recommendations = result.data.tracks
 
     // get top 3 recommendations
-    const topThreeRecs = recommendations.slice(0,3)
+    const topThreeRecs = recommendations.slice(0,5)
 
     const template = handlebars.compile(templateRaw)
-    const recommendationsHtml = template({ track, topThreeRecs })
+    const recommendationsHtml = template({ artist1,artist2, artist3 , topThreeRecs })
 
     // set the recommendation output's inner html do the resolved temple
     output.innerHTML = recommendationsHtml
@@ -68,7 +68,7 @@ const enableButton = () => {
 }
 
 const templateRaw = `
-<p>If you like "{{track}}", you'll love:</p>
+<p>If you like "{{artist1}}", "{{artist2}}" and "{{artist3}}" you'll love:</p>
 <ul>
   {{#each topThreeRecs}}
   <li>{{name}} - <a href="{{external_urls.spotify}}" target="_blank">Play</a></li>
