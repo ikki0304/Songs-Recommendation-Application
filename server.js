@@ -41,7 +41,7 @@ app.post("/recommendations", async (req, res) => {
 
   const { artist1, artist2, artist3 } = req.body;
   
-
+  
   if (!artist1 || !artist2 || !artist3) {
     return res
       .status(400)
@@ -76,7 +76,7 @@ app.post("/recommendations", async (req, res) => {
           message: `Artists ${artist} not found.`
         });
       }
-
+      console.log(artists);
       // save the first search result's trackId to a variable
       console.log(artists.items[0].id);
       return artists.items[0].id;
@@ -87,11 +87,11 @@ app.post("/recommendations", async (req, res) => {
     }
   };
   
-  const artistID1=await getArtistIDs(artist1)
-  const artistID2=await getArtistIDs(artist2)
-  const artistID3=await getArtistIDs(artist3)
+  const artistID1=await getArtistIDs(artist1);
+  const artistID2=await getArtistIDs(artist2);
+  const artistID3=await getArtistIDs(artist3);
   
-  console.log()
+  console.log(artistID1+" "+artistID2+" "+artistID3);
 
   //     artist.forEach(async artist => {
   //       try {
@@ -115,13 +115,9 @@ app.post("/recommendations", async (req, res) => {
   //     });
   // 3. get song recommendations
 
-  const artistID1 = artistIDs[0];
-  const artistID2 = artistIDs[1];
-  const artistID3 = artistIDs[2];
-  console.log("populated");
+  
 
   try {
-    console.log(artistID1, artistID2, artistID3);
     const result = await getRecommendations(http, {
       artistID1,
       artistID2,
