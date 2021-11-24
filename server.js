@@ -71,7 +71,7 @@ app.post("/recommendations", async (req, res) => {
   artist.forEach(async artist => {
     try {
       const result = await searchTracks(http, { artist });
-      const { artists } = result.arists;
+      const { artists } = result;
 
       if (!artists || !artists.items || !artists.items.length) {
         return res.status(404).send({
@@ -89,9 +89,10 @@ app.post("/recommendations", async (req, res) => {
 
   // 3. get song recommendations
   
-  const artistID1=artistsIDs[0];
+  const artistID1=artistIDs[0];
   const artistID2=artistIDs[1];
   const artistID3=artistIDs[2];
+  
   try {
     const result = await getRecommendations(http, {
       artistID1,
