@@ -50,7 +50,7 @@ app.post("/recommendations", async (req, res) => {
 
   // 1. Get access token
   let accessToken;
-  
+
   try {
     accessToken = await getAccessToken();
   } catch (err) {
@@ -67,59 +67,61 @@ app.post("/recommendations", async (req, res) => {
 
   // 2. get track id from search
   const artistIDs = new Array();
-  
-  
-  const myFunction=async ()=>{artist.forEach(async artist => {
-    try {
-      const result = await searchTracks(http, { artist });
-      const { artists } = result;
+  let artistID1;
+  let artistID2;
+  let artistID3;
 
-      if (!artists || !artists.items || !artists.items.length) {
-        return res.status(404).send({
-          message: `Artists ${artist} not found.`
-        });
+    artist.forEach(async artist => {
+      try {
+        const result = await searchTracks(http, { artist });
+        const { artists } = result;
+
+        if (!artists || !artists.items || !artists.items.length) {
+          return res.status(404).send({
+            message: `Artists ${artist} not found.`
+          });
+        }
+
+        // save the first search result's trackId to a variable
+        console.log(artists.items[0].id);
+        artistIDs.push(artists.items[0].id);
+        //console.log(artistIDs);
+      } catch (err) {
+        console.error(err.message);
+        return res.status(500).send({ message: "Error when searching tracks" });
+      }
+    });
+    // 3. get song recommendations
+
+    const artistID1 = artistIDs[0];
+    const artistID2 = artistIDs[1];
+    const artistID3 = artistIDs[2];
+    console.log("populated");
+
+    try {
+      console.log(artistID1, artistID2, artistID3);
+      const result = await getRecommendations(http, {
+        artistID1,
+        artistID2,
+        artistID3
+      });
+      const { tracks } = result;
+
+      // if no songs returned in search, send a 404 response
+      if (!tracks || !tracks.length) {
+        return res.status(404).send({ message: "No recommendations found." });
       }
 
-      // save the first search result's trackId to a variable
-      //console.log(artists.items[0].id);
-      artistIDs.push(artists.items[0].id);
-      //console.log(artistIDs);
+      // Success! Send track recommendations back to client
+      return res.send({ tracks });
     } catch (err) {
       console.error(err.message);
-      return res.status(500).send({ message: "Error when searching tracks" });
+      return res
+        .status(500)
+        .send({
+          message: "Something went wrong when fetching recommendations"
+        });
     }
-  });
-}
-  // 3. get song recommendations
-  await myFunction(){
-   const artistID1=artistIDs[0];
-   const artistID2=artistIDs[1];
-   const artistID3=artistIDs[2];
-    console.log("populated")
-  
-  
-  console.log(artistID1 + " "+ artistIDs[1]);
-  
-  try {
-    const result = await getRecommendations(http, {
-      artistID1, artistID2, artistID3
-    });
-    const { tracks } = result;
-
-    // if no songs returned in search, send a 404 response
-    if (!tracks || !tracks.length) {
-      return res.status(404).send({ message: "No recommendations found." });
-    }
-
-    // Success! Send track recommendations back to client
-    return res.send({ tracks });
-  } catch (err) {
-    console.error(err.message);
-    return res
-      .status(500)
-      .send({ message: "Something went wrong when fetching recommendations" });
-  }
-}
 });
 
 // after our app has been set up above, start listening on a port provided by Glitch
